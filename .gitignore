@@ -1,0 +1,22 @@
+
+# Project-specific
+.env
+local.settings.json
+data/
+.python_packages/
+
+# Project-specific
+.env
+local.settings.json
+data/
+.python_packages/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# macOS
+.DS_Store
