@@ -14,7 +14,7 @@ app = func.FunctionApp()
 
 @app.timer_trigger(schedule="0 5 */3 * * *", arg_name="timer", run_on_startup=False)
 def firms_timer(timer: func.TimerRequest) -> None:
-    logging.info("FIRMS result: %s", collect_firms(day_range=1))
+    logging.info("FIRMS result: %s", collect_firms(day_range=2))
 
 
 @app.timer_trigger(schedule="0 */10 * * * *", arg_name="timer", run_on_startup=False)

@@ -7,7 +7,7 @@ from .storage import save_raw
 BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 
 
-def collect_firms(day_range: int = 1) -> dict:
+def collect_firms(day_range: int = 2) -> dict:
     """Download the last `day_range` days of detections over Victoria for each satellite."""
     if not config.FIRMS_MAP_KEY:
         raise RuntimeError("FIRMS_MAP_KEY is not set")

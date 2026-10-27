@@ -7,6 +7,7 @@ from pathlib import Path
 from collectors import config
 from parsers.bom import parse_bom_fdr
 from parsers.cfa import parse_cfa_district
+from parsers.firms import parse_firms_csv
 from parsers.vicemergency import parse_vicemergency
 
 DATA = Path(config.LOCAL_DATA_DIR)
@@ -70,7 +71,23 @@ def parse_vicemergency_all() -> None:
     for (ft, c1, c2, ev, fc), n in counts.most_common():
         print(f"  {n:3d}  {ft} | {c1} | {c2} | {ev}  ->  {fc}")
 
-PARSERS = {"bom": parse_bom, "cfa": parse_cfa, "vicemergency": parse_vicemergency_all}
+def parse_firms_all() -> None:
+    rows, seen = [], set()
+    for path in sorted((DATA / "firms").rglob("*.csv")):
+        source = path.stem.split("_", 1)[1]  # "20261027T020320Z_VIIRS_NOAA20_NRT" -> "VIIRS_NOAA20_NRT"
+        for row in parse_firms_csv(path.read_bytes(), source, source_file=str(path.relative_to(DATA))):
+            key = (row["satellite"], row["lat"], row["lon"], row["acq_utc"])  # overlapping downloads
+            if key not in seen:
+                seen.add(key)
+                rows.append(row)
+    write_csv(rows, "firms_detections.csv")
+
+    print("\nDetections by Melbourne date and confidence:")
+    counts = Counter((r["local_date"], r["confidence"]) for r in rows)
+    for (day, conf), n in sorted(counts.items()):
+        print(f"  {day}  {conf:8s} {n}")
+
+PARSERS = {"bom": parse_bom, "cfa": parse_cfa, "vicemergency": parse_vicemergency_all, "firms": parse_firms_all}
 
 if __name__ == "__main__":
     for name in sys.argv[1:] or list(PARSERS):
