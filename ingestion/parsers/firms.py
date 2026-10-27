@@ -8,15 +8,16 @@ VIIRS_CONFIDENCE = {"l": "low", "n": "nominal", "h": "high"}
 
 
 def _confidence_level(instrument: str, raw: str) -> str:
-    if instrument == "VIIRS":
-        return VIIRS_CONFIDENCE.get(raw.strip().lower(), "unknown")
-    try:  # MODIS: 0-100, using FIRMS' usual bands
-        value = int(raw)
+    value = raw.strip().lower()
+    if value in VIIRS_CONFIDENCE:  # VIIRS letters, whatever the instrument is called
+        return VIIRS_CONFIDENCE[value]
+    try:  # MODIS: 0-100
+        number = int(value)
     except ValueError:
         return "unknown"
-    if value < 30:
+    if number < 30:
         return "low"
-    return "nominal" if value < 80 else "high"
+    return "nominal" if number < 80 else "high"
 
 
 def parse_firms_csv(csv_bytes: bytes, source: str, source_file: str = "") -> list[dict]:
