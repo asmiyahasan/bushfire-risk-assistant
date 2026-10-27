@@ -5,6 +5,7 @@ import sys
 from collectors.bom import collect_bom_fdr
 from collectors.cfa import collect_cfa
 from collectors.firms import collect_firms
+from collectors.dea import collect_dea
 from collectors.vicemergency import collect_vicemergency
 
 COLLECTORS = {
@@ -12,6 +13,7 @@ COLLECTORS = {
     "vicemergency": collect_vicemergency,
     "cfa": collect_cfa,
     "bom": collect_bom_fdr,
+    "dea": collect_dea,
 }
 
 

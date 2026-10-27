@@ -34,3 +34,6 @@ CFA_DISTRICTS = [
 # BOM fire danger ratings via anonymous FTP. Confirm the product ID in BOM's FTP listing.
 BOM_FDR_PRODUCT_ID = os.getenv("BOM_FDR_PRODUCT_ID", "IDV18555")
 BOM_FTP_TEMPLATE = "ftp://ftp.bom.gov.au/anon/gen/fwo/{product_id}.xml"
+
+# DEA Hotspots (Geoscience Australia): last 72 hours, all of Australia. CC BY 4.0.
+DEA_RECENT_URL = "https://hotspots.dea.ga.gov.au/data/recent-hotspots.json"

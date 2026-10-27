@@ -9,6 +9,7 @@ from parsers.bom import parse_bom_fdr
 from parsers.cfa import parse_cfa_district
 from parsers.firms import parse_firms_csv
 from parsers.vicemergency import parse_vicemergency
+from parsers.dea import parse_dea
 
 DATA = Path(config.LOCAL_DATA_DIR)
 OUT = DATA / "parsed"
@@ -87,8 +88,25 @@ def parse_firms_all() -> None:
     for (day, conf), n in sorted(counts.items()):
         print(f"  {day}  {conf:8s} {n}")
 
-PARSERS = {"bom": parse_bom, "cfa": parse_cfa, "vicemergency": parse_vicemergency_all, "firms": parse_firms_all}
+def parse_dea_all() -> None:
+    rows, seen = [], set()
+    for path in sorted((DATA / "dea").rglob("*.json.gz")):
+        for row in parse_dea(gzip.decompress(path.read_bytes()), source_file=str(path.relative_to(DATA))):
+            if row["id"] not in seen:  # 72-hour files overlap heavily
+                seen.add(row["id"])
+                rows.append(row)
+    write_csv(rows, "dea_hotspots_vic.csv")
 
+    print("\nVictorian hotspots by product:")
+    for (sat, prod), n in Counter((r["satellite"], r["product"]) for r in rows).most_common():
+        print(f"  {n:5d}  {sat} | {prod}")
+    print("\nBy Melbourne date:")
+    for day, n in sorted(Counter(r["local_date"] for r in rows).items()):
+        print(f"  {day}  {n}")
+
+
+PARSERS = {"bom": parse_bom, "cfa": parse_cfa, "vicemergency": parse_vicemergency_all,
+           "firms": parse_firms_all, "dea": parse_dea_all}
 if __name__ == "__main__":
     for name in sys.argv[1:] or list(PARSERS):
         PARSERS[name]()
