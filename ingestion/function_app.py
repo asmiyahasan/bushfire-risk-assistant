@@ -7,6 +7,7 @@ from collectors.cfa import collect_cfa
 from collectors.firms import collect_firms
 from collectors.vicemergency import collect_vicemergency
 from collectors.dea import collect_dea
+from collectors.staleness import check_staleness
 
 app = func.FunctionApp()
 
@@ -36,3 +37,7 @@ def bom_timer(timer: func.TimerRequest) -> None:
 @app.timer_trigger(schedule="0 25 */3 * * *", arg_name="timer", run_on_startup=False)
 def dea_timer(timer: func.TimerRequest) -> None:
     logging.info("DEA result: %s", collect_dea())
+
+@app.timer_trigger(schedule="0 45 * * * *", arg_name="timer", run_on_startup=False)
+def staleness_timer(timer: func.TimerRequest) -> None:
+    logging.info("Staleness check: %s", check_staleness())
