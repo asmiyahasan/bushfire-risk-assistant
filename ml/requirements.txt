@@ -4,3 +4,4 @@ geopandas
 cdsapi
 xarray
 netCDF4
+scipy
