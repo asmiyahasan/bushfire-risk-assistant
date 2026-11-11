@@ -1,3 +1,6 @@
 pandas
 pyarrow
 geopandas
+cdsapi
+xarray
+netCDF4
