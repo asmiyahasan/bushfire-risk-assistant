@@ -35,5 +35,9 @@ CFA_DISTRICTS = [
 BOM_FDR_PRODUCT_ID = os.getenv("BOM_FDR_PRODUCT_ID", "IDV18555")
 BOM_FTP_TEMPLATE = "ftp://ftp.bom.gov.au/anon/gen/fwo/{product_id}.xml"
 
-# DEA Hotspots (Geoscience Australia): last 72 hours, all of Australia. CC BY 4.0.
-DEA_RECENT_URL = "https://hotspots.dea.ga.gov.au/data/recent-hotspots.json"
+# DEA Hotspots (Geoscience Australia): Victoria bounding box only, via WFS
+DEA_RECENT_URL = (
+    "https://hotspots.dea.ga.gov.au/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature"
+    "&typeName=public:hotspots_three_days&outputFormat=application/json"
+    "&bbox=140.9,-39.2,150.0,-33.9"
+)
