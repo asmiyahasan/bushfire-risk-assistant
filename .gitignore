@@ -2,7 +2,7 @@
 # Project-specific
 .env
 local.settings.json
-data/
+/data/
 .python_packages/
 .venv/
 
