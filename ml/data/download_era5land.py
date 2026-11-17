@@ -10,6 +10,7 @@ Usage:
 import argparse
 import calendar
 import shutil
+import time
 import zipfile
 from pathlib import Path
 
@@ -74,6 +75,20 @@ def fetch_month(client: cdsapi.Client, year: int, month: int) -> None:
     print(f"{year}-{month:02d}: saved {files} ({size_mb:.0f} MB)")
 
 
+def fetch_with_retry(client: cdsapi.Client, year: int, month: int, attempts: int = 30) -> None:
+    """Retry rejected or failed requests (e.g. Copernicus's queue limit) after a pause."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return fetch_month(client, year, month)
+        except Exception as exc:
+            text = str(exc)
+            last_line = text.strip().splitlines()[-1][:150] if text.strip() else type(exc).__name__
+            wait_min = 5 if ("queued" in text or "rejected" in text) else 2
+            print(f"{year}-{month:02d}: attempt {attempt} failed ({last_line}); retrying in {wait_min} min")
+            time.sleep(wait_min * 60)
+    raise RuntimeError(f"{year}-{month:02d}: gave up after {attempts} attempts")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("start", nargs="?", help="first month, YYYY-MM")
@@ -83,12 +98,12 @@ def main() -> None:
 
     client = cdsapi.Client()
     if args.test:
-        fetch_month(client, 2019, 12)
+        fetch_with_retry(client, 2019, 12)
         return
     if not (args.start and args.end):
         parser.error("give START and END months, or --test")
     for year, month in month_range(args.start, args.end):
-        fetch_month(client, year, month)
+        fetch_with_retry(client, year, month)
 
 
 if __name__ == "__main__":
